@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — LUMIÈRE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="checkout.css" />
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <script>
+    async function culqi() {
+      const token = Culqi.token;
+      const { cart, formData, cupon, descuento, total, btn, txt, errorDiv } = window._culqiData || {};
+      if (!token || !token.id) {
+        const error = Culqi.error;
+        if (errorDiv) { errorDiv.textContent = '⚠️ ' + (error && error.user_message ? error.user_message : 'Tarjeta rechazada'); errorDiv.style.display = 'block'; }
+        return;
+      }
+      Culqi.close();
+      if (txt) txt.textContent = 'Procesando...';
+      if (btn) btn.disabled = true;
+      try {
+        const res = await fetch('/api/culqi-charge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: token.id, amount: total, email: formData.email, payer: formData, items: cart, cupon: cupon || null, descuento })
+        });
+        const data = await res.json();
+        console.log('Enviando a Culqi charge:', { total, amountSoles: total, amountCentavos: Math.round(Number(total)*100), descuento, cupon });
+        if (!res.ok) { console.error('CULQI ERROR:', JSON.stringify(data.debug)); throw new Error(data.error); }
+        const pedido = { id: data.pedidoId, fecha: new Date().toLocaleString('es-PE'), cliente: formData.nombre, whatsapp: formData.whatsapp, email: formData.email, direccion: formData.direccion + ', ' + formData.distrito + ', ' + formData.departamento, turno: formData.turno, productos: cart.map(i => ({ nombre: i.name, qty: i.qty, precio: i.price })), total, cupon: cupon || '', descuento };
+        localStorage.setItem('lumiere_ultimo_pedido', JSON.stringify(pedido));
+        localStorage.removeItem('lumiere_cart');
+        window.location.href = '/gracias.html?status=approved';
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.style.display = 'block'; }
+        if (txt) txt.textContent = 'Pagar con tarjeta →';
+        if (errorDiv) { errorDiv.textContent = '⚠️ ' + err.message; errorDiv.style.display = 'block'; }
+      }
+    }
+  </script>
+  <script src="https://checkout.culqi.com/js/v4"></script>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <a href="https://wa.me/51924213531?text=Hola%2C%20tengo%20una%20consulta%20sobre%20mi%20pedido%20LUMI%C3%88RE" class="wa-float" target="_blank" title="¿Tienes dudas? Escríbenos">💬</a>
+
+  <div class="urgency-bar">
+    <span>⚡ OFERTA FLASH — 30% de descuento &nbsp;|&nbsp; Termina en: <span id="countdown">--:--:--</span></span>
+  </div>
+
+  <nav>
+    <a href="index.html" class="logo">LUMIÈRE</a>
+    <ul class="nav-links">
+      <li><a href="index.html#productos">Productos</a></li>
+      <li><a href="index.html#nosotros">Nosotros</a></li>
+      <li><a href="index.html#testimonios">Reviews</a></li>
+    </ul>
+    <a href="index.html" class="cart-btn">← Seguir comprando</a>
+  </nav>
+
+  <main class="checkout-main">
+
+    <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+    <div class="checkout-form-col">
+      <div class="checkout-header">
+        <span class="section-label">✦ Paso final</span>
+        <h1 class="checkout-title">Tus <span>datos</span> de envío</h1>
+        <p class="checkout-subtitle">Completa el formulario y serás redirigido a Mercado Pago para pagar de forma segura.</p>
+      </div>
+
+      <form id="checkoutForm" novalidate>
+
+        <!-- DATOS PERSONALES -->
+        <div class="form-section">
+          <div class="form-section-title">👤 Datos personales</div>
+          <div class="form-group">
+            <label for="nombre">Nombre completo *</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej: María García López" autocomplete="name" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="whatsapp">WhatsApp *</label>
+              <input type="tel" id="whatsapp" name="whatsapp" placeholder="999 888 777" autocomplete="tel" />
+            </div>
+            <div class="form-group">
+              <label for="email">Correo electrónico *</label>
+              <input type="email" id="email" name="email" placeholder="tu@correo.com" autocomplete="email" />
+            </div>
+          </div>
+        </div>
+
+        <!-- DIRECCIÓN -->
+        <div class="form-section">
+          <div class="form-section-title">📍 Dirección de envío</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="departamento">Departamento *</label>
+              <select id="departamento" name="departamento">
+                <option value="">Selecciona...</option>
+                <option>Lima</option><option>Arequipa</option><option>Cusco</option>
+                <option>La Libertad</option><option>Piura</option><option>Lambayeque</option>
+                <option>Junín</option><option>Ica</option><option>Ancash</option>
+                <option>Cajamarca</option><option>Puno</option><option>Loreto</option>
+                <option>Ucayali</option><option>San Martín</option><option>Tacna</option>
+                <option>Moquegua</option><option>Tumbes</option><option>Pasco</option>
+                <option>Huánuco</option><option>Huancavelica</option><option>Ayacucho</option>
+                <option>Apurímac</option><option>Amazonas</option><option>Madre de Dios</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="distrito">Distrito *</label>
+              <input type="text" id="distrito" name="distrito" placeholder="Ej: Miraflores" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="direccion">Dirección exacta *</label>
+            <input type="text" id="direccion" name="direccion" placeholder="Av. Larco 123, Dpto 4B" autocomplete="street-address" />
+          </div>
+          <div class="form-group">
+            <label for="referencia">Referencia del lugar *</label>
+            <input type="text" id="referencia" name="referencia" placeholder="Frente al banco BCP, casa de color azul..." />
+          </div>
+        </div>
+
+        <!-- PREFERENCIAS -->
+        <div class="form-section">
+          <div class="form-section-title">🕐 Preferencias de entrega</div>
+          <div class="form-group">
+            <label for="turno">Turno preferido para recibir *</label>
+            <select id="turno" name="turno">
+              <option value="">Selecciona un turno...</option>
+              <option value="Mañana (9am - 1pm)">Mañana (9am - 1pm)</option>
+              <option value="Tarde (1pm - 6pm)">Tarde (1pm - 6pm)</option>
+              <option value="Noche (6pm - 9pm)">Noche (6pm - 9pm)</option>
+              <option value="Cualquier horario">Cualquier horario</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="regalo">¿Es un regalo? 🎁</label>
+              <select id="regalo" name="regalo">
+                <option value="no">No, es para mí</option>
+                <option value="si">Sí — incluir empaque especial</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="fuente">¿Cómo nos conociste?</label>
+              <select id="fuente" name="fuente">
+                <option value="No especificado">Prefiero no decir</option>
+                <option value="Instagram">Instagram</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Facebook">Facebook</option>
+                <option value="Google">Google</option>
+                <option value="Recomendación">Recomendación de amiga</option>
+                <option value="YouTube">YouTube</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="nota">Nota adicional <span class="label-opt">(opcional)</span></label>
+            <textarea id="nota" name="nota" rows="3" placeholder="Dejar con el portero, llamar antes de llegar..."></textarea>
+          </div>
+        </div>
+
+
+        <!-- CUPÓN DE DESCUENTO -->
+        <div class="form-section">
+          <div class="form-section-title">🎟️ Código de descuento</div>
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <input type="text" id="cuponInput" placeholder="Ej: LUMIERE10" style="flex:1;text-transform:uppercase;" />
+            <button type="button" id="cuponBtn" onclick="aplicarCupon()" style="
+              background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));
+              border:none;padding:14px 20px;border-radius:12px;color:#fff;
+              font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:2px;
+              text-transform:uppercase;cursor:pointer;white-space:nowrap;
+            ">Aplicar</button>
+          </div>
+          <div id="cuponMsg" style="font-size:13px;margin-top:6px;display:none;"></div>
+          <div id="cuponQuitarBtn" style="display:none;margin-top:8px;">
+            <button type="button" onclick="quitarCupon()" style="
+              background:none;border:1px solid var(--glass-border);padding:6px 14px;
+              border-radius:12px;color:var(--text-muted);font-size:12px;cursor:pointer;
+            ">✕ Quitar cupón</button>
+          </div>
+        </div>
+
+        <!-- TÉRMINOS -->
+        <div class="form-terms">
+          <label class="terms-label">
+            <input type="checkbox" id="terminos" name="terminos" />
+            <span>Acepto los <a href="#" class="terms-link">términos y condiciones</a> y la <a href="#" class="terms-link">política de privacidad</a></span>
+          </label>
+        </div>
+
+        <!-- ERROR MERCADO PAGO -->
+        <div id="pagoError" style="display:none;background:rgba(255,59,92,.1);border:1px solid rgba(255,59,92,.3);border-radius:4px;padding:12px 16px;font-size:13px;color:#ff3b5c;margin-bottom:16px;"></div>
+
+        <!-- SUBMIT -->
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span id="submitText">Pagar con tarjeta →</span>
+        </button>
+
+        <p class="submit-note">🔒 Pago 100% seguro procesado por Culqi. Acepta tarjetas Visa, Mastercard y American Express.</p>
+
+      </form>
+    </div>
+
+    <!-- COLUMNA DERECHA: RESUMEN -->
+    <div class="checkout-summary-col">
+      <div class="summary-box">
+        <div class="summary-title">
+          <span class="section-label">✦ Tu pedido</span>
+        </div>
+        <div id="orderItems"></div>
+        <div class="summary-divider"></div>
+        <div class="summary-totals">
+          <div class="summary-row"><span>Subtotal</span><span id="orderTotal">S/ 0</span></div>
+          <div class="summary-row"><span>Envío</span><span class="free-shipping">Coordinar por WhatsApp</span></div>
+          <div class="summary-row" id="descuentoRow" style="display:none;color:#22c55e;">
+            <span>Descuento cupón</span>
+            <span id="orderDescuento">− S/ 0</span>
+          </div>
+          <div class="summary-row summary-grand"><span>Total</span><span id="orderTotalFinal">S/ 0</span></div>
+        </div>
+        <div class="summary-divider"></div>
+
+        <!-- MÉTODOS DE PAGO -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--neon-purple);margin-bottom:12px;">Métodos de pago</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <span style="background:rgba(255,255,255,.06);border:1px solid var(--glass-border);border-radius:10px;padding:6px 12px;font-size:12px;">💳 Tarjeta</span>
+            <span style="background:rgba(255,255,255,.06);border:1px solid var(--glass-border);border-radius:10px;padding:6px 12px;font-size:12px;">📱 Yape</span>
+            <span style="background:rgba(255,255,255,.06);border:1px solid var(--glass-border);border-radius:10px;padding:6px 12px;font-size:12px;">💜 Plin</span>
+            <span style="background:rgba(255,255,255,.06);border:1px solid var(--glass-border);border-radius:10px;padding:6px 12px;font-size:12px;">🏦 Transferencia</span>
+          </div>
+        </div>
+
+        <div class="summary-badges">
+          <div class="summary-badge"><span class="badge-icon">🔒</span><span>Pago seguro SSL</span></div>
+          <div class="summary-badge"><span class="badge-icon">↩️</span><span>30 días devolución</span></div>
+          <div class="summary-badge"><span class="badge-icon">✓</span><span>Producto original certificado</span></div>
+        </div>
+
+        <div class="shipping-info">
+          <div class="shipping-title">📦 Información de envío</div>
+          <ul class="shipping-list">
+            <li>Lima Metropolitana: 1-2 días hábiles</li>
+            <li>Provincias: 3-5 días hábiles</li>
+            <li>Costo coordinar por WhatsApp</li>
+            <li>Envío gratis en compras +S/ 300</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SCRIPTS — pago.js PRIMERO, luego checkout.js -->
+  <script src="pago.js"></script>
+  <script src="checkout.js"></script>
+
+</body>
+</html>

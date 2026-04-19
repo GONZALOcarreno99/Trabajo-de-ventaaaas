@@ -1,0 +1,439 @@
+/* ============================================
+   LUMIÈRE — checkout.css
+   ============================================ */
+
+/* ---------- LAYOUT ---------- */
+.checkout-main {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 120px 40px 80px;
+  align-items: start;
+}
+
+/* ---------- HEADER ---------- */
+.checkout-header {
+  margin-bottom: 48px;
+}
+
+.checkout-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 300;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+
+.checkout-title span {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.checkout-subtitle {
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 500px;
+}
+
+/* ---------- FORM SECTIONS ---------- */
+.form-section {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+.form-section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text);
+}
+
+/* ---------- FORM GROUPS ---------- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ---------- LABELS ---------- */
+label {
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.label-opt {
+  text-transform: none;
+  font-size: 12px;
+  color: rgba(240, 238, 255, 0.3);
+  letter-spacing: 0;
+}
+
+/* ---------- INPUTS ---------- */
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+select,
+textarea {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  padding: 14px 16px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  width: 100%;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(240, 238, 255, 0.25);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--neon-purple);
+  box-shadow: 0 0 0 3px rgba(180, 95, 255, 0.1);
+}
+
+select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(180,95,255,0.6)' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+
+select option {
+  background: #0a0a14;
+  color: var(--text);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.5;
+}
+
+/* ---------- ERRORES ---------- */
+.field-error {
+  border-color: #ff3b5c !important;
+  box-shadow: 0 0 0 3px rgba(255, 59, 92, 0.15) !important;
+}
+
+.error-msg {
+  font-size: 12px;
+  color: #ff3b5c;
+  margin-top: 4px;
+}
+
+/* ---------- TÉRMINOS ---------- */
+.form-terms {
+  margin-bottom: 28px;
+}
+
+.terms-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+.terms-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: var(--neon-purple);
+  cursor: pointer;
+}
+
+.terms-link {
+  color: var(--neon-purple);
+  text-decoration: none;
+}
+
+.terms-link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- SUBMIT ---------- */
+.btn-submit {
+  width: 100%;
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+  border: none;
+  padding: 20px;
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s, opacity 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-submit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 50px rgba(180, 95, 255, 0.5);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.submit-note {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ---------- SUMMARY BOX ---------- */
+.checkout-summary-col {
+  position: sticky;
+  top: 100px;
+}
+
+.summary-box {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.summary-title {
+  margin-bottom: 24px;
+}
+
+/* ---------- SUMMARY ITEMS ---------- */
+.summary-item {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--glass-border);
+  align-items: center;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 10px;
+  background: var(--dark3);
+  flex-shrink: 0;
+}
+
+.summary-info {
+  flex: 1;
+}
+
+.summary-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.summary-qty {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.summary-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.summary-price {
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #fff, var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.summary-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s;
+  padding: 2px;
+}
+
+.summary-remove:hover {
+  color: var(--neon-pink);
+}
+
+.summary-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--text-muted);
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--neon-purple);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* ---------- TOTALES ---------- */
+.summary-divider {
+  height: 1px;
+  background: var(--glass-border);
+  margin: 20px 0;
+}
+
+.summary-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.summary-grand {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.summary-grand span:last-child {
+  background: linear-gradient(135deg, #fff, var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.free-shipping {
+  color: var(--neon-purple);
+  font-size: 13px;
+}
+
+/* ---------- BADGES ---------- */
+.summary-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summary-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.badge-icon {
+  font-size: 16px;
+}
+
+/* ---------- SHIPPING INFO ---------- */
+.shipping-info {
+  background: rgba(180, 95, 255, 0.06);
+  border: 1px solid rgba(180, 95, 255, 0.15);
+  border-radius: 4px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.shipping-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neon-purple);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.shipping-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shipping-list li {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding-left: 14px;
+  position: relative;
+}
+
+.shipping-list li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--neon-purple);
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px) {
+  .checkout-main {
+    grid-template-columns: 1fr;
+    padding: 100px 20px 60px;
+  }
+
+  .checkout-summary-col {
+    position: static;
+    order: -1;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-section {
+    padding: 20px;
+  }
+}

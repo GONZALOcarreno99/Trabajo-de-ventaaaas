@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estado del pago — LUMIÈRE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .thanks-main {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 40px 80px;
+      position: relative;
+    }
+    .thanks-bg {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 70% at 50% 40%, rgba(0,180,100,.1) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 60%, rgba(180,95,255,.08) 0%, transparent 60%),
+        var(--dark);
+    }
+    .thanks-card {
+      position: relative;
+      z-index: 2;
+      max-width: 620px;
+      width: 100%;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 60px 48px;
+      text-align: center;
+    }
+    @keyframes scaleIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @media (max-width: 600px) {
+      .thanks-card { padding: 40px 20px; }
+      .thanks-main { padding: 80px 20px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <a href="https://wa.me/51924213531?text=Hola%2C%20acabo%20de%20hacer%20un%20pedido%20en%20LUMI%C3%88RE" class="wa-float" target="_blank" title="Coordinar entrega por WhatsApp">💬</a>
+
+  <div class="urgency-bar">
+    <span>⚡ LUMIÈRE — Cosmética del Futuro</span>
+  </div>
+
+  <nav>
+    <a href="index.html" class="logo">LUMIÈRE</a>
+    <ul class="nav-links">
+      <li><a href="index.html#productos">Productos</a></li>
+    </ul>
+    <a href="index.html" class="cart-btn">Volver a la tienda</a>
+  </nav>
+
+  <div class="thanks-bg"></div>
+
+  <main class="thanks-main">
+    <div class="thanks-card">
+      <div id="pagoStatus">
+        <p style="color:var(--text-muted);padding:40px 0">Verificando tu pago...</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="pago.js"></script>
+  <script>
+    // Cursor
+    var cur = document.getElementById('cursor');
+    var ring = document.getElementById('cursorRing');
+    document.addEventListener('mousemove', function(e) {
+      cur.style.left = e.clientX + 'px';
+      cur.style.top  = e.clientY + 'px';
+      ring.style.left = e.clientX + 'px';
+      ring.style.top  = e.clientY + 'px';
+    });
+  </script>
+</body>
+</html>

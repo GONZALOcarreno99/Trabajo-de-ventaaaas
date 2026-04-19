@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="LUMIÈRE — Cosmética de próxima generación. Fórmulas biotecnológicas de lujo." />
+  <title>LUMIÈRE — Cosmética del Futuro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <a href="https://wa.me/51924213531?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20los%20productos%20LUMI%C3%88RE" class="wa-float" target="_blank" title="Escríbenos por WhatsApp">💬</a>
+  <div class="overlay" id="overlay" onclick="closeCart()"></div>
+
+  <div class="urgency-bar">
+    <span>⚡ OFERTA FLASH — Solo por hoy: 30% de descuento en toda la colección &nbsp;|&nbsp; Termina en: <span id="countdown">02:47:33</span></span>
+  </div>
+
+  <nav>
+    <div class="logo">LUMIÈRE</div>
+    <ul class="nav-links">
+      <li><a href="#productos">Productos</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#testimonios">Reviews</a></li>
+      <li><a href="#oferta">Ofertas</a></li>
+    </ul>
+    <button class="cart-btn" onclick="openCart()">
+      Carrito <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="grid-lines"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="hero-content">
+      <div class="hero-tag">✦ Cosmética de próxima generación</div>
+      <h1>La belleza del <span>futuro</span><br>empieza contigo</h1>
+      <p class="hero-sub">Fórmulas biotecnológicas de última generación. Ingredientes de origen estelar. Una experiencia sensorial que redefine la belleza premium.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="scrollToProducts()">Comprar Ahora</button>
+        <button class="btn-secondary" onclick="scrollToProducts()">Ver Colección →</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="stat-num">98K+</div><div class="stat-label">Clientas felices</div></div>
+        <div><div class="stat-num">4.9★</div><div class="stat-label">Valoración media</div></div>
+        <div><div class="stat-num">15+</div><div class="stat-label">Premios de lujo</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTOS -->
+  <section id="productos">
+    <div style="max-width:1200px;margin:0 auto;">
+      <span class="section-label">✦ Colección Estelar</span>
+      <h2 class="section-title">Nuestros <span>productos</span><br>más codiciados</h2>
+    </div>
+    <div class="products-grid reveal" id="productsGrid"></div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="nosotros">
+    <div style="max-width:1200px;margin:0 auto;text-align:center;">
+      <span class="section-label">✦ La diferencia LUMIÈRE</span>
+      <h2 class="section-title">Por qué elegir el <span>futuro</span></h2>
+    </div>
+    <div class="features-grid reveal">
+      <div class="feature-item"><span class="feature-icon">🔬</span><div class="feature-title">Biotecnología Avanzada</div><p class="feature-desc">Fórmulas desarrolladas con IA y biotecnología de vanguardia. 10 años de investigación.</p></div>
+      <div class="feature-item"><span class="feature-icon">🌱</span><div class="feature-title">100% Sostenible</div><p class="feature-desc">Ingredientes de origen ético, envases biodegradables y huella de carbono cero.</p></div>
+      <div class="feature-item"><span class="feature-icon">✨</span><div class="feature-title">Resultados Visibles</div><p class="feature-desc">Resultados medibles desde las primeras 72 horas. Garantía de devolución de 30 días.</p></div>
+      <div class="feature-item"><span class="feature-icon">🏆</span><div class="feature-title">Lujo Certificado</div><p class="feature-desc">Premiada en Paris, Milán y Tokio. La elección de las celebridades internacionales.</p></div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIOS -->
+  <section id="testimonios">
+    <div style="max-width:1200px;margin:0 auto;">
+      <span class="section-label">✦ Voces reales</span>
+      <h2 class="section-title">Lo que dicen <span>ellas</span></h2>
+    </div>
+    <div class="testimonials-grid reveal">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">Jamás había sentido mi piel tan luminosa. El Sérum Nebula cambió completamente mi rutina. En dos semanas, mi piel lucía 10 años más joven.</p>
+        <div class="testimonial-author"><div class="author-avatar">V</div><div><div class="author-name">Valentina Torres</div><div class="author-handle">@vale_glows · Lima, Perú</div></div></div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">Los colores del Palette Aurora son increíbles. Duran todo el día sin correrse. El packaging es una obra de arte, se siente como lujo absoluto.</p>
+        <div class="testimonial-author"><div class="author-avatar">S</div><div><div class="author-name">Sofía Méndez</div><div class="author-handle">@sofia_beauty · México DF</div></div></div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">El envío fue rapidísimo y el unboxing fue como abrir un regalo de lujo. La crema Cosmos Noir es simplemente magistral. No volvería a otra marca.</p>
+        <div class="testimonial-author"><div class="author-avatar">C</div><div><div class="author-name">Camila Reyes</div><div class="author-handle">@cami.glow · Bogotá, Colombia</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="oferta" class="cta-section">
+    <div class="cta-bg"></div>
+    <div class="cta-content reveal">
+      <span class="section-label">✦ Oferta exclusiva · Solo hoy</span>
+      <div class="cta-discount">−30%</div>
+      <h2 class="section-title" style="margin-bottom:8px;">En toda la <span>colección estelar</span></h2>
+      <p style="color:var(--text-muted);font-size:16px;margin-bottom:32px;">Solo quedan <strong style="color:var(--neon-pink);">23 unidades</strong> al precio especial.</p>
+      <div class="cta-timer-label">La oferta termina en</div>
+      <div class="timer-boxes">
+        <div class="timer-box"><div class="timer-num" id="t-h">02</div><div class="timer-unit">Horas</div></div>
+        <div class="timer-box"><div class="timer-num" id="t-m">47</div><div class="timer-unit">Min</div></div>
+        <div class="timer-box"><div class="timer-num" id="t-s">33</div><div class="timer-unit">Seg</div></div>
+      </div>
+      <button class="btn-primary" style="font-size:16px;padding:20px 60px;" onclick="scrollToProducts()">Aprovechar Oferta →</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="logo">LUMIÈRE</span>
+        <p class="footer-tagline">"La belleza que trasciende el tiempo,<br>la tecnología que la hace eterna."</p>
+        <div class="social-links">
+          <div class="social-btn">𝕏</div>
+          <div class="social-btn">▷</div>
+          <div class="social-btn">◎</div>
+          <div class="social-btn">f</div>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Tienda</h4><ul><li><a href="#productos">Todos los productos</a></li><li><a href="#productos">Novedades</a></li><li><a href="#productos">Más vendidos</a></li><li><a href="#oferta">Ofertas</a></li></ul></div>
+      <div class="footer-col"><h4>Nosotros</h4><ul><li><a href="#nosotros">Nuestra historia</a></li><li><a href="#nosotros">Sustentabilidad</a></li><li><a href="#">Prensa</a></li><li><a href="#">Afiliados</a></li></ul></div>
+      <div class="footer-col"><h4>Soporte</h4><ul><li><a href="#" onclick="openWhatsApp()">Envíos</a></li><li><a href="#" onclick="openWhatsApp()">Devoluciones</a></li><li><a href="#" onclick="openWhatsApp()">Contacto</a></li><li><a href="#">Privacidad</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 LUMIÈRE. Todos los derechos reservados.</span>
+      <span class="footer-accent">✦ Hecho con amor y biotecnología</span>
+    </div>
+  </footer>
+
+  <!-- CART DRAWER -->
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Carrito de compras">
+    <div class="cart-header">
+      <h3>Tu Carrito</h3>
+      <button class="close-cart" onclick="closeCart()" aria-label="Cerrar carrito">✕</button>
+    </div>
+    <div id="cartItems"></div>
+    <div id="cartFooter"></div>
+  </aside>
+
+  <!-- WHATSAPP FLOTANTE -->
+  <a class="whatsapp-float" id="whatsappFloat" href="#" onclick="openWhatsApp(); return false;" title="Chatea con nosotros">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    <span class="whatsapp-label">¿Tienes dudas?</span>
+  </a>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="pago.js"></script>
+  <script src="main.js"></script>
+  <script>
+    // ============================================================
+    // ⚠️ CAMBIA ESTE NÚMERO POR EL TUYO (código país + número)
+    // Ejemplo Perú: '51987654321'
+    // ============================================================
+    const WA_NUMBER = '51924213531';
+
+    function openWhatsApp() {
+      const msg = encodeURIComponent('Hola LUMIÈRE 👋 ¡Quiero más información sobre sus productos!');
+      window.open('https://wa.me/' + WA_NUMBER + '?text=' + msg, '_blank');
+    }
+
+    setTimeout(function() {
+      document.getElementById('whatsappFloat').classList.add('visible');
+    }, 3000);
+  </script>
+</body>
+</html>
