@@ -688,27 +688,6 @@ function openProductModal(id) {
 
           </div>
 
-          <!-- RESEÑAS EN MODAL -->
-          <div id="resenasModal-${p.id}" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--glass-border);">
-            <p style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;">✦ Reseñas</p>
-            <div id="resenasLista-${p.id}" style="font-size:13px;color:var(--text-muted);">Cargando reseñas...</div>
-            <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);">
-              <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Dejar una reseña</p>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                <input id="rnNombre-${p.id}" type="text" placeholder="Tu nombre" style="padding:8px 12px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:8px;color:#f0eeff;font-size:13px;" />
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <span style="font-size:13px;color:var(--text-muted);">Estrellas:</span>
-                  <select id="rnEstrellas-${p.id}" style="padding:6px 10px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:8px;color:#f0eeff;font-size:13px;">
-                    <option value="5">★★★★★</option><option value="4">★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option>
-                  </select>
-                </div>
-                <textarea id="rnComentario-${p.id}" placeholder="Tu experiencia con este producto..." rows="3" style="padding:8px 12px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:8px;color:#f0eeff;font-size:13px;resize:vertical;"></textarea>
-                <button onclick="enviarResena(${p.id})" style="background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));border:none;padding:10px;border-radius:10px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Enviar reseña</button>
-                <div id="rnMsg-${p.id}" style="font-size:12px;display:none;"></div>
-              </div>
-            </div>
-          </div>
-
           <!-- PRODUCTOS RELACIONADOS EN MODAL -->
           <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--glass-border);">
             <p style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;">✦ También te puede interesar</p>
@@ -746,49 +725,12 @@ function openProductModal(id) {
 
   document.body.appendChild(modal);
   document.body.style.overflow = 'hidden';
-  cargarResenasModal(p.id);
 }
 
 function closeProductModal() {
   const modal = document.getElementById('productModal');
   if (modal) modal.remove();
   document.body.style.overflow = '';
-}
-
-async function cargarResenasModal(productoId) {
-  const el = document.getElementById('resenasLista-' + productoId);
-  if (!el) return;
-  try {
-    const all = await (await fetch('/api/productos?resenas=1')).json();
-    const resenas = all.filter(r => !r.productoId || r.productoId === String(productoId) || r.productoId === '');
-    if (!resenas.length) { el.innerHTML = '<span style="color:var(--text-muted);font-size:13px;">Sé el primero en opinar.</span>'; return; }
-    el.innerHTML = resenas.slice(0, 5).map(r => `
-      <div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-          <span style="font-weight:600;font-size:13px;color:#f0eeff;">${r.nombre}</span>
-          <span style="color:#f59e0b;font-size:12px;">${'★'.repeat(r.estrellas)}</span>
-        </div>
-        <div style="font-size:13px;color:rgba(240,238,255,0.65);">${r.comentario}</div>
-      </div>`).join('');
-  } catch { el.innerHTML = ''; }
-}
-
-async function enviarResena(productoId) {
-  const nombre = (document.getElementById('rnNombre-' + productoId)?.value || '').trim();
-  const estrellas = document.getElementById('rnEstrellas-' + productoId)?.value;
-  const comentario = (document.getElementById('rnComentario-' + productoId)?.value || '').trim();
-  const msgEl = document.getElementById('rnMsg-' + productoId);
-  if (!nombre || !comentario) { msgEl.textContent = '⚠️ Completa tu nombre y comentario'; msgEl.style.color = '#ff3b5c'; msgEl.style.display = 'block'; return; }
-  try {
-    const res = await fetch('/api/productos', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productoId: String(productoId), nombre, estrellas, comentario }) });
-    const data = await res.json();
-    msgEl.textContent = data.msg || '✓ Reseña enviada, aparecerá tras ser aprobada.';
-    msgEl.style.color = '#22c55e';
-    msgEl.style.display = 'block';
-    document.getElementById('rnNombre-' + productoId).value = '';
-    document.getElementById('rnComentario-' + productoId).value = '';
-  } catch { msgEl.textContent = '⚠️ Error al enviar'; msgEl.style.color = '#ff3b5c'; msgEl.style.display = 'block'; }
 }
 
 function toggleAccordion(key) {
