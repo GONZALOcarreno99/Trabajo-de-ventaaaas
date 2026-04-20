@@ -13,7 +13,7 @@
   <script>
     async function culqi() {
       const token = Culqi.token;
-      const { cart, formData, cupon, descuento, total, btn, txt, errorDiv } = window._culqiData || {};
+      const { cart, formData, cupon, descuento, total, amountCentavos, btn, txt, errorDiv } = window._culqiData || {};
       if (!token || !token.id) {
         const error = Culqi.error;
         if (errorDiv) { errorDiv.textContent = '⚠️ ' + (error && error.user_message ? error.user_message : 'Tarjeta rechazada'); errorDiv.style.display = 'block'; }
@@ -26,10 +26,9 @@
         const res = await fetch('/api/culqi-charge', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: token.id, amount: total, email: formData.email, payer: formData, items: cart, cupon: cupon || null, descuento })
+          body: JSON.stringify({ token: token.id, amount: amountCentavos, email: formData.email, payer: formData, items: cart, cupon: cupon || null, descuento })
         });
         const data = await res.json();
-        console.log('Enviando a Culqi charge:', { total, amountSoles: total, amountCentavos: Math.round(Number(total)*100), descuento, cupon });
         if (!res.ok) { console.error('CULQI ERROR:', JSON.stringify(data.debug)); throw new Error(data.error); }
         const pedido = { id: data.pedidoId, fecha: new Date().toLocaleString('es-PE'), cliente: formData.nombre, whatsapp: formData.whatsapp, email: formData.email, direccion: formData.direccion + ', ' + formData.distrito + ', ' + formData.departamento, turno: formData.turno, productos: cart.map(i => ({ nombre: i.name, qty: i.qty, precio: i.price })), total, cupon: cupon || '', descuento };
         localStorage.setItem('lumiere_ultimo_pedido', JSON.stringify(pedido));

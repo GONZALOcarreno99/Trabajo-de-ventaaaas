@@ -188,11 +188,14 @@ async function iniciarPagoMP(cart, formData, cupon, descuentoYaCalculado) {
   btn.disabled = true;
   txt.textContent = 'Cargando pago...';
 
-  const subtotal = cart.reduce((s, i) => s + Number(i.price) * Number(i.qty), 0);
-  const descuento = Number(descuentoYaCalculado) || 0;
-  const total = Math.round((subtotal - descuento) * 100) / 100;
+  // Usar aritmética entera en centavos para evitar errores de punto flotante
+  const subtotalCentavos = cart.reduce((s, i) => s + Math.round(Number(i.price) * 100) * Number(i.qty), 0);
+  const descuentoCentavos = Math.round((Number(descuentoYaCalculado) || 0) * 100);
+  const totalCentavos = subtotalCentavos - descuentoCentavos;
+  const descuento = descuentoCentavos / 100;
+  const total = totalCentavos / 100;
 
-  if (!total || total <= 0) {
+  if (totalCentavos <= 0) {
     if (errorDiv) { errorDiv.textContent = '⚠️ Error en el carrito. Recarga la página e intenta de nuevo.'; errorDiv.style.display = 'block'; }
     btn.disabled = false;
     txt.textContent = 'Pagar con tarjeta →';
@@ -200,10 +203,16 @@ async function iniciarPagoMP(cart, formData, cupon, descuentoYaCalculado) {
     return;
   }
 
-  console.log('iniciarPago:', { subtotal, descuento, total, amountCentavos: Math.round(total*100) });
+  if (totalCentavos < 100) {
+    if (errorDiv) { errorDiv.textContent = '⚠️ El monto mínimo de compra es S/ 1.00. Revisa tu carrito.'; errorDiv.style.display = 'block'; }
+    btn.disabled = false;
+    txt.textContent = 'Pagar con tarjeta →';
+    window._pagoProcesando = false;
+    return;
+  }
 
   // Guardar datos para usar en el callback global de Culqi
-  window._culqiData = { cart, formData, cupon, descuento, total, btn, txt, errorDiv };
+  window._culqiData = { cart, formData, cupon, descuento, total, amountCentavos: totalCentavos, btn, txt, errorDiv };
 
   // Configurar Culqi v4
   Culqi.publicKey = PAGO_CONFIG.culqiPublicKey;
@@ -211,7 +220,7 @@ async function iniciarPagoMP(cart, formData, cupon, descuentoYaCalculado) {
     title:       'LUMIÈRE',
     currency:    'PEN',
     description: 'Compra en LUMIÈRE',
-    amount:      Math.round(total * 100)
+    amount:      totalCentavos
   });
   Culqi.open();
 

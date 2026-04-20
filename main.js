@@ -514,9 +514,36 @@ function renderProducts() {
 }
 
 // ============================================
-// MODAL DE PRODUCTO
+// MODAL DE PRODUCTO — CARRUSEL DE IMÁGENES
 // ============================================
 
+function changeModalImage(idx) {
+  const imgs = window._modalImgs;
+  if (!imgs || idx < 0 || idx >= imgs.length) return;
+  window._modalImgIdx = idx;
+
+  const mainImg = document.getElementById('modalMainImg');
+  if (!mainImg) return;
+  mainImg.src = imgs[idx];
+  mainImg.onclick = function() { initZoomImagen(imgs[idx], mainImg.alt); };
+
+  document.querySelectorAll('#modalThumbs img').forEach((thumb, i) => {
+    thumb.style.borderColor = i === idx ? 'var(--neon-purple)' : 'rgba(255,255,255,0.15)';
+  });
+
+  const prev = document.getElementById('modalPrev');
+  const next = document.getElementById('modalNext');
+  if (prev) prev.style.opacity = idx === 0 ? '0.25' : '1';
+  if (next) next.style.opacity = idx === imgs.length - 1 ? '0.25' : '1';
+}
+
+function prevModalImage() {
+  changeModalImage((window._modalImgIdx || 0) - 1);
+}
+
+function nextModalImage() {
+  changeModalImage((window._modalImgIdx || 0) + 1);
+}
 
 // ============================================
 // PRODUCTOS RELACIONADOS
@@ -542,6 +569,10 @@ function openProductModal(id) {
 
   const discount = Math.round((1 - p.price / p.old) * 100);
 
+  // Inicializar estado del carrusel
+  window._modalImgs    = p.imgs;
+  window._modalImgIdx  = 0;
+
   const modal = document.createElement('div');
   modal.id = 'productModal';
   modal.style.cssText = `
@@ -559,7 +590,7 @@ function openProductModal(id) {
       #productModal .modal-inner { animation: slideUp 0.3s ease; }
       @media (max-width: 700px) {
         .modal-grid { grid-template-columns: 1fr !important; }
-        .modal-grid > div:first-child { min-height: 220px !important; max-height: 260px !important; overflow: hidden !important; }
+        .modal-grid > div:first-child { min-height: 220px !important; max-height: 300px !important; overflow: hidden !important; }
         .modal-grid > div:last-child { padding: 20px 16px !important; max-height: none !important; overflow-y: visible !important; }
         .modal-info-col { max-height: none !important; overflow-y: visible !important; padding: 20px 16px !important; }
         #productModal { align-items: flex-start !important; padding: 0 !important; overflow-y: auto !important; }
@@ -584,20 +615,35 @@ function openProductModal(id) {
 
         <!-- IMAGEN -->
         <div style="position:relative;background:var(--dark3);min-height:400px;overflow:hidden;display:flex;flex-direction:column;">
-          <div style="flex:1;position:relative;min-height:340px;">
-            <img id="modalMainImg" src="${p.imgs[0]}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;position:absolute;inset:0;"
+          <div style="flex:1;position:relative;min-height:300px;">
+            <img id="modalMainImg" src="${p.imgs[0]}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;position:absolute;inset:0;transition:opacity 0.2s;"
               onclick="initZoomImagen(this.src, '${p.name}')"
               title="Clic para ampliar">
             <div style="position:absolute;top:16px;left:16px;background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;">−${discount}%</div>
             <div style="position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.2);border-radius:4px;padding:6px 10px;font-size:11px;color:#fff;font-family:'Rajdhani',sans-serif;letter-spacing:1px;pointer-events:none;">🔍 Clic para ampliar</div>
+            ${p.imgs.length > 1 ? `
+            <button id="modalPrev" onclick="prevModalImage()" style="
+              position:absolute;left:10px;top:50%;transform:translateY(-50%);
+              background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.2);
+              width:38px;height:38px;border-radius:50%;color:#fff;font-size:18px;
+              cursor:pointer;display:flex;align-items:center;justify-content:center;
+              transition:all 0.2s;opacity:0.25;z-index:5;
+            ">‹</button>
+            <button id="modalNext" onclick="nextModalImage()" style="
+              position:absolute;right:10px;top:50%;transform:translateY(-50%);
+              background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.2);
+              width:38px;height:38px;border-radius:50%;color:#fff;font-size:18px;
+              cursor:pointer;display:flex;align-items:center;justify-content:center;
+              transition:all 0.2s;opacity:1;z-index:5;
+            ">›</button>` : ''}
           </div>
           ${p.imgs.length > 1 ? `
-          <div style="display:flex;gap:6px;padding:10px;background:rgba(0,0,0,0.4);overflow-x:auto;">
+          <div id="modalThumbs" style="display:flex;gap:6px;padding:10px;background:rgba(0,0,0,0.4);overflow-x:auto;flex-shrink:0;">
             ${p.imgs.map((img, idx) => `
               <img src="${img}" alt="${p.name} ${idx+1}"
-                onclick="document.getElementById('modalMainImg').src='${img}';document.getElementById('modalMainImg').onclick=function(){initZoomImagen('${img}','${p.name}')}"
+                onclick="changeModalImage(${idx})"
                 style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${idx===0?'var(--neon-purple)':'rgba(255,255,255,0.15)'};flex-shrink:0;transition:border-color 0.2s;"
-                onmouseover="this.style.borderColor='var(--neon-purple)'" onmouseout="this.style.borderColor='${idx===0?'var(--neon-purple)':'rgba(255,255,255,0.15)'}'" />
+                onmouseover="this.style.borderColor='var(--neon-purple)'" onmouseout="if(window._modalImgIdx!==${idx})this.style.borderColor='rgba(255,255,255,0.15)'" />
             `).join('')}
           </div>` : ''}
         </div>

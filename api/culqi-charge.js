@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
 
-  const { token, email, payer, items, cupon, descuento } = req.body;
+  const { token, amount, email, payer, items, cupon, descuento } = req.body;
 
   if (!token || !email || !items || !items.length) {
     return res.status(400).json({ error: 'Faltan datos del pago' });
@@ -20,18 +20,28 @@ module.exports = async function handler(req, res) {
   let verifiedItems = items;
   if (productosKV && productosKV.length > 0) {
     verifiedItems = items.map(item => {
-      const p = productosKV.find(p => p.id === item.id);
+      const p = productosKV.find(p => String(p.id) === String(item.id));
       return p ? { ...item, price: p.price } : item;
     });
   }
 
-  const subtotalVerificado = verifiedItems.reduce((s, i) => s + Number(i.price) * Number(i.qty), 0);
-  const descuentoNum = Math.min(Number(descuento) || 0, subtotalVerificado);
-  const totalVerificado = Math.round((subtotalVerificado - descuentoNum) * 100) / 100;
+  // Aritmética entera en centavos para evitar errores de punto flotante
+  const subtotalCentavos = verifiedItems.reduce((s, i) => s + Math.round(Number(i.price) * 100) * Number(i.qty), 0);
+  const descuentoCentavos = Math.min(Math.round((Number(descuento) || 0) * 100), subtotalCentavos);
+  const totalCentavos = subtotalCentavos - descuentoCentavos;
 
-  const amountCentavos = Math.round(totalVerificado * 100);
+  // Usar el monto enviado desde el frontend (es el mismo que se pasó a Culqi.settings)
+  // Validar que sea razonable: >= 100 centavos y no mayor que el subtotal completo
+  const amountCentavos = Math.round(Number(amount) || 0);
   if (!amountCentavos || amountCentavos < 100) {
-    return res.status(400).json({ error: 'Monto inválido: S/ ' + totalVerificado + '. Recarga la página e intenta de nuevo.' });
+    return res.status(400).json({ error: 'Monto inválido. El monto mínimo es S/ 1.00.' });
+  }
+  if (amountCentavos > subtotalCentavos) {
+    return res.status(400).json({ error: 'Monto inválido. Recarga la página e intenta de nuevo.' });
+  }
+  // Tolerancia de 1 centavo por redondeo
+  if (Math.abs(amountCentavos - totalCentavos) > 1) {
+    return res.status(400).json({ error: 'El monto no coincide con el carrito. Recarga la página e intenta de nuevo.' });
   }
 
   // Verificar stock disponible antes de cobrar
@@ -131,9 +141,9 @@ module.exports = async function handler(req, res) {
         nota:         payer.nota || ''
       },
       items:     verifiedItems.map(i => ({ id: i.id, name: i.name, qty: Number(i.qty), price: Number(i.price) })),
-      subtotal:  subtotalVerificado,
-      descuento: descuentoNum,
-      total:     totalVerificado,
+      subtotal:  subtotalCentavos / 100,
+      descuento: descuentoCentavos / 100,
+      total:     amountCentavos / 100,
       cupon:     cupon || null
     };
 
