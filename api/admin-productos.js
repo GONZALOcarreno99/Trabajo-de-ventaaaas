@@ -16,7 +16,8 @@ module.exports = async function handler(req, res) {
   let productos = await kv.get('lumiere_productos') || [];
 
   if (action === 'add') {
-    const newProduct = { ...producto, id: Date.now(), imgs: [producto.img || 'productos/creap.jpg'] };
+    const imgs = producto.imgs && producto.imgs.length ? producto.imgs : [producto.img || 'productos/creap.jpg'];
+    const newProduct = { ...producto, id: Date.now(), imgs };
     delete newProduct.img;
     productos.push(newProduct);
     await kv.set('lumiere_productos', productos);
@@ -24,18 +25,22 @@ module.exports = async function handler(req, res) {
   }
 
   if (action === 'edit') {
+    let found = false;
     productos = productos.map(p => {
-      if (p.id !== id) return p;
-      const updated = { ...p, ...producto, id: p.id, imgs: [producto.img || (p.imgs && p.imgs[0]) || 'productos/creap.jpg'] };
+      if (String(p.id) !== String(id)) return p;
+      found = true;
+      const imgs = producto.imgs && producto.imgs.length ? producto.imgs : [producto.img || (p.imgs && p.imgs[0]) || 'productos/creap.jpg'];
+      const updated = { ...p, ...producto, id: p.id, imgs };
       delete updated.img;
       return updated;
     });
+    if (!found) return res.status(404).json({ error: 'Producto no encontrado. Usa "Importar base" primero si editas productos por defecto.' });
     await kv.set('lumiere_productos', productos);
     return res.status(200).json({ ok: true });
   }
 
   if (action === 'delete') {
-    productos = productos.filter(p => p.id !== id);
+    productos = productos.filter(p => String(p.id) !== String(id));
     await kv.set('lumiere_productos', productos);
     return res.status(200).json({ ok: true });
   }

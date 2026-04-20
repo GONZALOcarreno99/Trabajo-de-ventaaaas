@@ -958,6 +958,18 @@
       <!-- MAIN CONTENT -->
       <main id="adminMain">
 
+        <!-- ALERTA STOCK BAJO -->
+        <div id="stockAlertBar" style="display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:none;">
+          <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+            <span style="font-size:20px;">⚠️</span>
+            <div style="flex:1;">
+              <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#f59e0b;margin-bottom:4px;">Alerta de stock bajo</div>
+              <div id="stockAlertList" style="font-size:13px;color:rgba(240,238,255,0.8);"></div>
+            </div>
+            <button onclick="document.getElementById('stockAlertBar').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;">✕</button>
+          </div>
+        </div>
+
         <div class="page-topbar">
           <div>
             <div class="page-title">Panel de <span id="pageTitle">control</span></div>
@@ -985,6 +997,7 @@
             </select>
             <span class="prod-count" id="pedidosCount"></span>
             <button class="btn btn-sm btn-secondary" onclick="cargarPedidos()">↻ Actualizar</button>
+            <button class="btn btn-sm btn-success" onclick="exportarCSV()">⬇ Exportar Excel</button>
           </div>
           <div id="pedidosLista">
             <div style="color:var(--muted);font-size:14px;padding:20px;">Cargando pedidos...</div>
@@ -1418,6 +1431,7 @@
         const data = await res.json();
         productosData = data;
         renderProductos(data);
+        verificarStockBajo(data);
       } catch {
         document.getElementById('productosGrid').innerHTML =
           '<div style="color:var(--muted);font-size:14px;padding:20px;">Error al cargar productos.</div>';
@@ -1543,10 +1557,19 @@
         { file: document.getElementById('pImgFile3'), hidden: document.getElementById('pImg3') }
       ];
       const imgUrls = [];
+      let imgIdx = 0;
       for (const inp of imgInputs) {
+        imgIdx++;
         if (inp.file.files[0]) {
-          try { toast('Subiendo imagen...'); imgUrls.push(await subirImagen(inp.file.files[0])); }
-          catch (e) { toast('⚠️ ' + e.message); return; }
+          try {
+            toast('Subiendo imagen ' + imgIdx + '...');
+            const url = await subirImagen(inp.file.files[0]);
+            imgUrls.push(url);
+            toast('✓ Imagen ' + imgIdx + ' subida');
+          } catch (e) {
+            toast('⚠️ Error imagen ' + imgIdx + ': ' + e.message);
+            return;
+          }
         } else if (inp.hidden.value.trim()) {
           imgUrls.push(inp.hidden.value.trim());
         }
@@ -1796,6 +1819,80 @@
         stat('🏆', 'Producto estrella', topProducto ? topProducto[0] : '—', topProducto ? topProducto[1] + ' unidades vendidas' : '', 'rgba(255,63,164,0.15)') +
         stat('🎟️', 'Cupón más usado', topCupon ? topCupon[0] : 'Ninguno', topCupon ? topCupon[1] + ' usos' : '', 'rgba(0,207,255,0.15)') +
         stat('📈', 'Ticket promedio', (total - estados.cancelado) ? 'S/ ' + Math.round(ingresos / (total - estados.cancelado)).toLocaleString() : '—', 'solo pedidos activos', 'rgba(180,95,255,0.15)');
+
+      const productosAgotados  = productosData.filter(p => (p.stock !== undefined ? p.stock : 99) === 0).length;
+      const productosStockBajo = productosData.filter(p => { const s = p.stock !== undefined ? p.stock : 99; return s > 0 && s <= STOCK_MIN; }).length;
+      if (productosAgotados || productosStockBajo) {
+        cont.innerHTML += stat('⚠️', 'Alertas de inventario',
+          productosAgotados + ' agotado' + (productosAgotados !== 1 ? 's' : ''),
+          productosStockBajo + ' con stock bajo (≤' + STOCK_MIN + ' unidades)',
+          'rgba(239,68,68,0.15)');
+      }
+    }
+
+    // ==================
+    // ====== ALERTA STOCK BAJO ======
+    // ==================
+    const STOCK_MIN = 5;
+
+    function verificarStockBajo(productos) {
+      const bajos = productos.filter(p => (p.stock !== undefined ? p.stock : 99) <= STOCK_MIN && (p.stock !== undefined ? p.stock : 99) >= 0);
+      const bar  = document.getElementById('stockAlertBar');
+      const list = document.getElementById('stockAlertList');
+      if (!bajos.length) { bar.style.display = 'none'; return; }
+      list.innerHTML = bajos.map(p => {
+        const s = p.stock !== undefined ? p.stock : 99;
+        const color = s === 0 ? '#ef4444' : '#f59e0b';
+        return `<span style="margin-right:16px;color:${color};"><strong>${p.name}</strong>: ${s === 0 ? 'AGOTADO' : s + ' unidades restantes'}</span>`;
+      }).join('');
+      bar.style.display = 'block';
+    }
+
+    // ==================
+    // ====== EXPORTAR CSV ======
+    // ==================
+    function exportarCSV() {
+      if (!pedidosData.length) { toast('⚠️ No hay pedidos para exportar'); return; }
+
+      const filtro = document.getElementById('filtroPedido').value;
+      const buscar = (document.getElementById('buscarPedido').value || '').toLowerCase().trim();
+      let lista = filtro ? pedidosData.filter(p => p.estado === filtro) : [...pedidosData];
+      if (buscar) {
+        lista = lista.filter(p =>
+          (p.id || '').toLowerCase().includes(buscar) ||
+          (p.cliente?.nombre || '').toLowerCase().includes(buscar) ||
+          (p.cliente?.email || '').toLowerCase().includes(buscar)
+        );
+      }
+
+      const esc = v => '"' + String(v || '').replace(/"/g, '""') + '"';
+
+      const cabecera = ['ID Pedido','Fecha','Estado','Nombre','WhatsApp','Email','Departamento','Distrito','Dirección','Turno','Nota','Productos','Subtotal','Cupón','Descuento','Total'];
+
+      const filas = lista.map(p => {
+        const fecha = new Date(p.fecha).toLocaleString('es-PE');
+        const productos = (p.items || []).map(i => i.name + ' x' + i.qty).join(' | ');
+        return [
+          p.id, fecha, p.estado,
+          p.cliente?.nombre, p.cliente?.whatsapp, p.cliente?.email,
+          p.cliente?.departamento, p.cliente?.distrito, p.cliente?.direccion,
+          p.cliente?.turno, p.cliente?.nota || '',
+          productos,
+          p.subtotal || p.total, p.cupon || '', p.descuento || 0, p.total
+        ].map(esc).join(',');
+      });
+
+      const csv = '\uFEFF' + [cabecera.map(esc).join(','), ...filas].join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = 'pedidos-lumiere-' + new Date().toISOString().slice(0,10) + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast('✓ Exportado: ' + lista.length + ' pedidos');
     }
 
     // ==================
